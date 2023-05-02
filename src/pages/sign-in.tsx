@@ -5,23 +5,43 @@ import { PhoneOutlined } from '@ant-design/icons'
 import CustomLayout from '@/components/Layout'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import { setCookie } from 'cookies-next'
+import { getCookie, setCookie } from 'cookies-next'
+import { NextPageContext } from 'next'
+import { auth } from '@/lib/auth'
+
+export async function getServerSideProps(ctx: NextPageContext) {
+    const token = getCookie('token', ctx)
+    const res = await auth(token as string)
+
+    if (res.status === 200) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: {}
+    }
+}
 
 export default () => {
     const router = useRouter()
 
     const onFinish = (values: any) => {
         console.log('Received values of form: ', values)
-        // axios
-        //     .post('http://localhost:3300/auth/sign-in', values, {
-        //         withCredentials: true
-        //     })
-        //     .then((res) => {
-        //         if (res.status === 200) router.push('/')
-        //     })
-        //     .catch((err) => {
-        //         console.log(err.response.data)
-        //     })
+        axios
+            .post('http://localhost:3300/auth/sign-in', values, {
+                withCredentials: true
+            })
+            .then((res) => {
+                if (res.status === 200) router.push('/')
+            })
+            .catch((err) => {
+                console.log(err.response)
+            })
     }
 
     return (
