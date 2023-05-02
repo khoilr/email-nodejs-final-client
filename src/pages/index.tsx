@@ -3,6 +3,7 @@ import EmailTable from '@/components/EmailTable'
 import CustomLayout from '@/components/Layout'
 import SearchBar from '@/components/SearchBar'
 import SidebarNavigation from '@/components/SidebarNavigation'
+import { auth } from '@/lib/auth'
 import { FormOutlined } from '@ant-design/icons'
 import { FloatButton, Input, Layout } from 'antd'
 import { getCookie } from 'cookies-next'
@@ -26,7 +27,29 @@ const contentStyle: React.CSSProperties = {
     color: '#fff'
 }
 
-export default function Home() {
+export async function getServerSideProps(ctx: NextPageContext) {
+    const token = getCookie('token', ctx)
+    const account = await auth(token as string)
+
+    if (account.status !== 200) {
+        return {
+            redirect: {
+                destination: '/sign-in',
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: {
+            account: account.data
+        }
+    }
+}
+
+export default function Home({ account }: { account: object }) {
+    console.log(account)
+
     const [open, setOpen] = useState(false)
 
     const handleOk = (e: React.MouseEvent<HTMLElement>) => {
