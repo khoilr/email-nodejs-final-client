@@ -10,7 +10,10 @@ const Layout = ({ children }: Props) => {
         <ConfigProvider
             theme={{
                 token: {
-                    colorPrimary: '#00b96b'
+                    colorPrimary: '#f27fac',
+                    colorInfo: '#13C2C2',
+                    borderRadius: 16,
+                    wireframe: false
                 }
             }}
         >

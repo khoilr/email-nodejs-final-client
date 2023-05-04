@@ -3,24 +3,49 @@ import { Col, Row, Form, Input, Button, Typography } from 'antd'
 import { PhoneOutlined, LockOutlined, IdcardOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import { getCookie } from 'cookies-next'
+import { auth } from '@/lib/auth'
+import { NextPageContext } from 'next'
 
 const { Title } = Typography
+export async function getServerSideProps(ctx: NextPageContext) {
+    const token = getCookie('token', ctx)
+    if (token) {
+        const res = await auth(token as string)
 
+        if (res.status === 200) {
+            return {
+                redirect: {
+                    destination: '/',
+                    permanent: false
+                }
+            }
+        } else {
+            return {
+                props: {}
+            }
+        }
+    } else {
+        return {
+            props: {}
+        }
+    }
+}
 export default () => {
     const router = useRouter()
 
     const onFinish = (values: any) => {
         console.log('Received values of form: ', values)
-        axios
-            .post('http://localhost:3300/auth', values)
-            .then((res) => {
-                if (res.status === 201) router.push('/')
-            })
-            .catch((err) => {
-                console.log(err)
-            })
+        // axios
+        //     .post('http://localhost:3300/auth', values)
+        //     .then((res) => {
+        //         if (res.status === 201) router.push('/')
+        //     })
+        //     .catch((err) => {
+        //         console.log(err)
+        //     })
     }
-    
+
     return (
         <CustomLayout>
             <Row
