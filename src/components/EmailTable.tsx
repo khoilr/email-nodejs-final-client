@@ -1,47 +1,48 @@
 import { Drawer, Row, Space, Table, Tag, Col, Divider, FloatButton } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useState } from 'react'
-import { FormOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { FormOutlined, DeleteOutlined, PlusOutlined, StarOutlined } from '@ant-design/icons'
 
 interface DataType {
     key: string
-    name: string
-    age: number
-    address: string
-    tags: string[]
+    sender: string
+    subject: string
+    received: string
+    labels: string[]
 }
 
 const columns: ColumnsType<DataType> = [
     {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
+        title: 'Starred',
+        dataIndex: 'starred',
+        key: 'starred',
+        render: (starred) => <a style={{color: "black"}}><StarOutlined/></a>
+    },
+    {
+        title: 'Sender',
+        dataIndex: 'sender',
+        key: 'sender',
         render: (text) => <a>{text}</a>
     },
     {
-        title: 'Age',
-        dataIndex: 'age',
-        key: 'age'
+        title: 'Subject',
+        dataIndex: 'subject',
+        key: 'subject'
     },
     {
-        title: 'Address',
-        dataIndex: 'address',
-        key: 'address'
-    },
-    {
-        title: 'Tags',
-        key: 'tags',
-        dataIndex: 'tags',
-        render: (_, { tags }) => (
+        title: 'Labels',
+        key: 'labels',
+        dataIndex: 'labels',
+        render: (_, { labels }) => (
             <>
-                {tags.map((tag) => {
-                    let color = tag.length > 5 ? 'geekblue' : 'green'
-                    if (tag === 'loser') {
+                {labels.map((labels) => {
+                    let color = labels.length > 5 ? 'geekblue' : 'green'
+                    if (labels === 'loser') {
                         color = 'volcano'
                     }
                     return (
-                        <Tag color={color} key={tag}>
-                            {tag.toUpperCase()}
+                        <Tag color={color} key={labels}>
+                            {labels.toUpperCase()}
                         </Tag>
                     )
                 })}
@@ -49,12 +50,16 @@ const columns: ColumnsType<DataType> = [
         )
     },
     {
+        title: 'Received time',
+        dataIndex: 'received',
+        key: 'received'
+    },
+    {
         title: 'Action',
         key: 'action',
         render: (_, record) => (
             <Space size="middle">
-                <a>Invite {record.name}</a>
-                <a>Delete</a>
+                <a style={{color: "red"}}><DeleteOutlined/></a>
             </Space>
         )
     }
@@ -69,8 +74,8 @@ const rowSelection = {
         )
     },
     getCheckboxProps: (record: DataType) => ({
-        disabled: record.name === 'Disabled User', // Column configuration not to be checked
-        name: record.name
+        disabled: record.sender === 'Disabled User', // Column configuration not to be checked
+        sender: record.sender
     })
 }
 
@@ -100,24 +105,24 @@ export default () => {
     const data: DataType[] = [
         {
             key: '1',
-            name: 'John Brown',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            tags: ['nice', 'developer']
+            sender: 'John Brown',
+            subject: 'New message',
+            received: '2021-01-01',
+            labels: ['nice', 'developer']
         },
         {
             key: '2',
-            name: 'Jim Green',
-            age: 42,
-            address: 'London No. 1 Lake Park',
-            tags: ['loser']
+            sender: 'Jim Green',
+            subject: 'New message',
+            received: '2021-01-01',
+            labels: ['loser']
         },
         {
             key: '3',
-            name: 'Joe Black',
-            age: 32,
-            address: 'Sydney No. 1 Lake Park',
-            tags: ['cool', 'teacher']
+            sender: 'Joe Black',
+            subject: 'New message',
+            received: '2021-01-01',
+            labels: ['cool', 'teacher']
         }
     ]
 

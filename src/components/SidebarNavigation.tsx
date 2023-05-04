@@ -7,7 +7,8 @@ import {
     LeftOutlined,
     RightOutlined,
     PlusOutlined,
-    SettingOutlined
+    DeleteOutlined,
+    SettingOutlined,
 } from '@ant-design/icons'
 import { Menu } from 'antd'
 import type { MenuProps } from 'antd/es/menu'
@@ -38,6 +39,7 @@ export default () => {
         getItem('Starred', '2', <StarOutlined />),
         getItem('Sent', '3', <SendOutlined />),
         getItem('Drafts', '4', <FileOutlined />),
+        getItem('Trash', '4', <DeleteOutlined />),
         { type: 'divider' },
         getItem('Manage labels', '5', <SettingOutlined />),
         getItem('Create new label', '6', <PlusOutlined />),
