@@ -4,10 +4,10 @@ import {
     StarOutlined,
     SendOutlined,
     MailOutlined,
+    DeleteOutlined,
     LeftOutlined,
     RightOutlined,
     PlusOutlined,
-    DeleteOutlined,
     SettingOutlined,
 } from '@ant-design/icons'
 import { Menu } from 'antd'
@@ -39,10 +39,10 @@ export default () => {
         getItem('Starred', '2', <StarOutlined />),
         getItem('Sent', '3', <SendOutlined />),
         getItem('Drafts', '4', <FileOutlined />),
-        getItem('Trash', '4', <DeleteOutlined />),
+        getItem('Trash', '5', <DeleteOutlined />),
         { type: 'divider' },
-        getItem('Manage labels', '5', <SettingOutlined />),
-        getItem('Create new label', '6', <PlusOutlined />),
+        getItem('Manage labels', '6', <SettingOutlined />),
+        getItem('Create new label', '7', <PlusOutlined />),
     ]
 
     const siderStyle: React.CSSProperties = {
