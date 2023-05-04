@@ -11,19 +11,25 @@ import { auth } from '@/lib/auth'
 
 export async function getServerSideProps(ctx: NextPageContext) {
     const token = getCookie('token', ctx)
-    const res = await auth(token as string)
+    if (token) {
+        const res = await auth(token as string)
 
-    if (res.status === 200) {
-        return {
-            redirect: {
-                destination: '/',
-                permanent: false
+        if (res.status === 200) {
+            return {
+                redirect: {
+                    destination: '/',
+                    permanent: false
+                }
+            }
+        } else {
+            return {
+                props: {}
             }
         }
-    }
-
-    return {
-        props: {}
+    } else {
+        return {
+            props: {}
+        }
     }
 }
 
