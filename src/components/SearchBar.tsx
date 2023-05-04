@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { UserOutlined, PlusOutlined } from '@ant-design/icons'
-import type { RcFile, UploadProps } from 'antd/es/upload';
-import type { UploadFile } from 'antd/es/upload/interface';
+import { UserOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons'
+import type { RcFile, UploadProps } from 'antd/es/upload'
+import type { UploadFile } from 'antd/es/upload/interface'
 import {
     AutoComplete,
     Avatar,
@@ -46,12 +46,12 @@ const renderItem = (title: string, count: number) => ({
 })
 
 const getBase64 = (file: RcFile): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
+    new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = (error) => reject(error)
+    })
 
 const options = [
     {
@@ -83,46 +83,60 @@ export default () => {
         setOpen(false)
     }
 
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const [previewImage, setPreviewImage] = useState('');
-    const [previewTitle, setPreviewTitle] = useState('');
-    const [fileList, setFileList] = useState<UploadFile[]>([
-    
-    ]);
+    const [previewOpen, setPreviewOpen] = useState(false)
+    const [previewImage, setPreviewImage] = useState('')
+    const [previewTitle, setPreviewTitle] = useState('')
+    const [fileList, setFileList] = useState<UploadFile[]>([])
 
-    const handleCancel = () => setPreviewOpen(false);
+    const handleCancel = () => setPreviewOpen(false)
 
     const handlePreview = async (file: UploadFile) => {
         if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj as RcFile);
+            file.preview = await getBase64(file.originFileObj as RcFile)
         }
 
-    setPreviewImage(file.url || (file.preview as string));
-    setPreviewOpen(true);
-    setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1));
-    };
+        setPreviewImage(file.url || (file.preview as string))
+        setPreviewOpen(true)
+        setPreviewTitle(
+            file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1)
+        )
+    }
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
-        setFileList(newFileList);
+        setFileList(newFileList)
 
     const uploadButton = (
         <div>
             <PlusOutlined />
             <div style={{ marginTop: 8 }}>Upload</div>
         </div>
-    );
+    )
 
     return (
-        <div className="flex h-full w-full flex-row items-center justify-around">
+        <div className="flex h-full w-full flex-row items-center justify-between">
+            <Button
+                type="primary"
+                size="large"
+                className="mx-2"
+                icon={<EditOutlined />}
+            >
+                Compose
+            </Button>
             <AutoComplete
                 popupClassName="certain-category-search-dropdown"
                 dropdownMatchSelectWidth={500}
-                style={{ width: '60%' }}
+                className="mx-2 flex-grow"
+                // style={{ width: '60%' }}
                 options={options}
             >
                 <Input.Search size="large" placeholder="Find email" />
             </AutoComplete>
-            <Button type="dashed" size="large" onClick={showDrawer}>
+            <Button
+                type="dashed"
+                className="mx-2"
+                size="large"
+                onClick={showDrawer}
+            >
                 Profile
             </Button>
             <Drawer
@@ -139,22 +153,25 @@ export default () => {
                     </Space>
                 }
             >
-                <Descriptions 
-                title="User Info"
-                extra={<Button type="primary">Edit</Button>}
-                > 
+                <Descriptions
+                    title="User Info"
+                    extra={<Button type="primary">Edit</Button>}
+                >
                     <Space wrap size={16}>
-                        <Avatar size={100} icon={<UserOutlined />}/>
+                        <Avatar size={100} icon={<UserOutlined />} />
                     </Space>
-                    <br/><br/>
-                    <Descriptions.Item label="Name" >
-                        Zhou Maomao 
+                    <br />
+                    <br />
+                    <Descriptions.Item label="Name">
+                        Zhou Maomao
                     </Descriptions.Item>
-                    <br/><br/>
+                    <br />
+                    <br />
                     <Descriptions.Item label="Phone">
-                        1810000000 
+                        1810000000
                     </Descriptions.Item>
-                    <br/><br/>
+                    <br />
+                    <br />
                     <Descriptions.Item label="Email">
                         hello@gmail.com
                     </Descriptions.Item>
@@ -169,37 +186,46 @@ export default () => {
                     >
                         {fileList.length >= 1 ? null : uploadButton}
                     </Upload>
-                    <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
-                        <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                    <Modal
+                        open={previewOpen}
+                        title={previewTitle}
+                        footer={null}
+                        onCancel={handleCancel}
+                    >
+                        <img
+                            alt="example"
+                            style={{ width: '100%' }}
+                            src={previewImage}
+                        />
                     </Modal>
-                    
-                    <label style={{color : "#9c9c9c"}}>
+
+                    <label style={{ color: '#9c9c9c' }}>
                         Name:
                         <Input
                             name="name"
                             type="text"
-                            placeholder={"Your name"}
+                            placeholder={'Your name'}
                         />
                     </label>
-                    
-                    <label style={{color : "#9c9c9c"}}>
+
+                    <label style={{ color: '#9c9c9c' }}>
                         Phone:
                         <Input
                             name="phone"
                             type="phone"
-                            placeholder={"Your phone"}
+                            placeholder={'Your phone'}
                         />
                     </label>
-                    
-                    <label style={{color : "#9c9c9c"}}>
+
+                    <label style={{ color: '#9c9c9c' }}>
                         Email:
                         <Input
                             name="email"
                             type="email"
-                            placeholder={"Your email"}
+                            placeholder={'Your email'}
                         />
                     </label>
-                </form>   
+                </form>
             </Drawer>
         </div>
     )

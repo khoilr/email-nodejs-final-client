@@ -4,13 +4,14 @@ import {
     StarOutlined,
     SendOutlined,
     MailOutlined,
+    EditOutlined,
     DeleteOutlined,
     LeftOutlined,
     RightOutlined,
     PlusOutlined,
-    SettingOutlined,
+    SettingOutlined
 } from '@ant-design/icons'
-import { Menu } from 'antd'
+import { Button, Menu } from 'antd'
 import type { MenuProps } from 'antd/es/menu'
 import { Layout } from 'antd'
 const { Sider } = Layout
@@ -42,14 +43,15 @@ export default () => {
         getItem('Trash', '5', <DeleteOutlined />),
         { type: 'divider' },
         getItem('Manage labels', '6', <SettingOutlined />),
-        getItem('Create new label', '7', <PlusOutlined />),
+        getItem('Create new label', '7', <PlusOutlined />)
     ]
 
     const siderStyle: React.CSSProperties = {
         textAlign: 'center',
         lineHeight: '120px',
         color: '#fff',
-        minHeight: '100vh'
+        minHeight: '100vh',
+        background: '#fff'
     }
 
     return (
@@ -63,7 +65,15 @@ export default () => {
             }}
             collapsible
             onCollapse={(value) => setCollapse(value)}
-            trigger={collapse ? <RightOutlined /> : <LeftOutlined />}
+            trigger={
+                <div className="h-full bg-white">
+                    {collapse ? (
+                        <RightOutlined style={{ color: 'black' }} />
+                    ) : (
+                        <LeftOutlined style={{ color: 'black' }} />
+                    )}
+                </div>
+            }
         >
             <Menu
                 style={{ width: '100%', height: '100%' }}

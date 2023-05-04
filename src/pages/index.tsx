@@ -78,19 +78,7 @@ export default function Home({ account }: { account: object }) {
                         <EmailTable />
                     </Content>
                 </Layout>
-                <FloatButton
-                    description="Compose"
-                    icon={<FormOutlined />}
-                    type="primary"
-                    shape="circle"
-                    onClick={showCompose}
-                    style={{ right: 64, bottom: 64, width: 96, height: 96 }}
-                />
-                <ComposeEmail
-                    open={open}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                />
+                
                 {/* <Drawer
                     // responsive width
                     width={640}
