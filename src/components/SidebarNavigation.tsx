@@ -7,13 +7,13 @@ import {
     LeftOutlined,
     RightOutlined,
     PlusOutlined,
+    DeleteOutlined,
     SettingOutlined,
 } from '@ant-design/icons'
-import { Button, Divider, Menu, Switch } from 'antd'
-import type { MenuProps, MenuTheme } from 'antd/es/menu'
-import { Layout, Space } from 'antd'
-import { inherits } from 'util'
-const { Header, Footer, Sider, Content } = Layout
+import { Menu } from 'antd'
+import type { MenuProps } from 'antd/es/menu'
+import { Layout } from 'antd'
+const { Sider } = Layout
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -33,15 +33,13 @@ function getItem(
 
 export default () => {
     const [collapse, setCollapse] = useState(false)
-    const toggleCollapse = () => {
-        setCollapse(!collapse)
-    }
 
     const items: MenuItem[] = [
         getItem('Inbox', '1', <MailOutlined />),
         getItem('Starred', '2', <StarOutlined />),
         getItem('Sent', '3', <SendOutlined />),
         getItem('Drafts', '4', <FileOutlined />),
+        getItem('Trash', '4', <DeleteOutlined />),
         { type: 'divider' },
         getItem('Manage labels', '5', <SettingOutlined />),
         getItem('Create new label', '6', <PlusOutlined />),
@@ -51,7 +49,6 @@ export default () => {
         textAlign: 'center',
         lineHeight: '120px',
         color: '#fff',
-        backgroundColor: '#3ba0e9',
         minHeight: '100vh'
     }
 
@@ -71,10 +68,14 @@ export default () => {
             <Menu
                 style={{ width: '100%', height: '100%' }}
                 defaultSelectedKeys={['1']}
-                defaultOpenKeys={['sub1']}
                 mode={'inline'}
                 theme={'light'}
                 items={items}
+                onClick={(e) => {
+                    switch (e.key) {
+                    }
+                    console.log(e.key)
+                }}
             />
         </Sider>
     )
