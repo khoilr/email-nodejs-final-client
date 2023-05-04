@@ -50,21 +50,7 @@ export async function getServerSideProps(ctx: NextPageContext) {
 export default function Home({ account }: { account: object }) {
     console.log(account)
 
-    const [open, setOpen] = useState(false)
-
-    const handleOk = (e: React.MouseEvent<HTMLElement>) => {
-        console.log(e)
-        setOpen(false)
-    }
-
-    const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
-        console.log(e)
-        setOpen(false)
-    }
-
-    const showCompose = () => {
-        setOpen(true)
-    }
+    
 
     return (
         <CustomLayout>
@@ -78,7 +64,6 @@ export default function Home({ account }: { account: object }) {
                         <EmailTable />
                     </Content>
                 </Layout>
-                
                 {/* <Drawer
                     // responsive width
                     width={640}

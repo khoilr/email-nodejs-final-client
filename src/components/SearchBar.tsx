@@ -11,8 +11,11 @@ import {
     Input,
     Modal,
     Upload,
-    Space
+    Space,
+    Form
 } from 'antd'
+import ComposeEmail from './ComposeEmail'
+import Profile from './Profile'
 
 const renderTitle = (title: string) => (
     <span>
@@ -75,53 +78,45 @@ const options = [
 ]
 
 export default () => {
-    const [open, setOpen] = useState(false)
-    const showDrawer = () => {
-        setOpen(true)
+    // Profile drawer
+    const [openProfile, setOpenProfile] = useState(false)
+    const showProfileDrawer = () => {
+        setOpenProfile(true)
     }
-    const onClose = () => {
-        setOpen(false)
-    }
-
-    const [previewOpen, setPreviewOpen] = useState(false)
-    const [previewImage, setPreviewImage] = useState('')
-    const [previewTitle, setPreviewTitle] = useState('')
-    const [fileList, setFileList] = useState<UploadFile[]>([])
-
-    const handleCancel = () => setPreviewOpen(false)
-
-    const handlePreview = async (file: UploadFile) => {
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj as RcFile)
-        }
-
-        setPreviewImage(file.url || (file.preview as string))
-        setPreviewOpen(true)
-        setPreviewTitle(
-            file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1)
-        )
+    const onProfileClose = () => {
+        setOpenProfile(false)
     }
 
-    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
-        setFileList(newFileList)
-
-    const uploadButton = (
-        <div>
-            <PlusOutlined />
-            <div style={{ marginTop: 8 }}>Upload</div>
-        </div>
-    )
+    // Compose email modal
+    const [openCompose, setOpenCompose] = useState(false)
+    const handleOk = (e: React.MouseEvent<HTMLElement>) => {
+        console.log(e)
+        setOpenCompose(false)
+    }
+    const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
+        console.log(e)
+        setOpenCompose(false)
+    }
+    const showCompose = () => {
+        setOpenCompose(true)
+    }
 
     return (
         <div className="flex h-full w-full flex-row items-center justify-between">
             <Button
                 type="primary"
                 size="large"
+                onClick={showCompose}
                 className="mx-2"
                 icon={<EditOutlined />}
             >
                 Compose
             </Button>
+            <ComposeEmail
+                open={openCompose}
+                onOk={handleOk}
+                onCancel={handleCancel}
+            />
             <AutoComplete
                 popupClassName="certain-category-search-dropdown"
                 dropdownMatchSelectWidth={500}
@@ -135,98 +130,11 @@ export default () => {
                 type="dashed"
                 className="mx-2"
                 size="large"
-                onClick={showDrawer}
+                onClick={showProfileDrawer}
             >
                 Profile
             </Button>
-            <Drawer
-                placement="right"
-                width={512}
-                onClose={onClose}
-                open={open}
-                extra={
-                    <Space>
-                        <Button onClick={onClose}>Cancel</Button>
-                        <Button type="primary" onClick={onClose}>
-                            OK
-                        </Button>
-                    </Space>
-                }
-            >
-                <Descriptions
-                    title="User Info"
-                    extra={<Button type="primary">Edit</Button>}
-                >
-                    <Space wrap size={16}>
-                        <Avatar size={100} icon={<UserOutlined />} />
-                    </Space>
-                    <br />
-                    <br />
-                    <Descriptions.Item label="Name">
-                        Zhou Maomao
-                    </Descriptions.Item>
-                    <br />
-                    <br />
-                    <Descriptions.Item label="Phone">
-                        1810000000
-                    </Descriptions.Item>
-                    <br />
-                    <br />
-                    <Descriptions.Item label="Email">
-                        hello@gmail.com
-                    </Descriptions.Item>
-                </Descriptions>
-                <form>
-                    <Upload
-                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                        listType="picture-circle"
-                        fileList={fileList}
-                        onPreview={handlePreview}
-                        onChange={handleChange}
-                    >
-                        {fileList.length >= 1 ? null : uploadButton}
-                    </Upload>
-                    <Modal
-                        open={previewOpen}
-                        title={previewTitle}
-                        footer={null}
-                        onCancel={handleCancel}
-                    >
-                        <img
-                            alt="example"
-                            style={{ width: '100%' }}
-                            src={previewImage}
-                        />
-                    </Modal>
-
-                    <label style={{ color: '#9c9c9c' }}>
-                        Name:
-                        <Input
-                            name="name"
-                            type="text"
-                            placeholder={'Your name'}
-                        />
-                    </label>
-
-                    <label style={{ color: '#9c9c9c' }}>
-                        Phone:
-                        <Input
-                            name="phone"
-                            type="phone"
-                            placeholder={'Your phone'}
-                        />
-                    </label>
-
-                    <label style={{ color: '#9c9c9c' }}>
-                        Email:
-                        <Input
-                            name="email"
-                            type="email"
-                            placeholder={'Your email'}
-                        />
-                    </label>
-                </form>
-            </Drawer>
+            <Profile open={openProfile} onClose={onProfileClose} />
         </div>
     )
 }
