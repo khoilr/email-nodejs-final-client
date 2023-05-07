@@ -32,15 +32,20 @@ function getItem(
     } as MenuItem
 }
 
-export default () => {
+type props = {
+    inbox: String
+    setInbox: React.Dispatch<React.SetStateAction<String>>
+}
+
+export default (props: props) => {
     const [collapse, setCollapse] = useState(false)
 
     const items: MenuItem[] = [
-        getItem('Inbox', '1', <MailOutlined />),
-        getItem('Starred', '2', <StarOutlined />),
-        getItem('Sent', '3', <SendOutlined />),
-        getItem('Drafts', '4', <FileOutlined />),
-        getItem('Trash', '5', <DeleteOutlined />),
+        getItem('Inbox', 'inbox', <MailOutlined />),
+        getItem('Starred', 'starred', <StarOutlined />),
+        getItem('Sent', 'sent', <SendOutlined />),
+        getItem('Drafts', 'drafts', <FileOutlined />),
+        getItem('Trash', 'trash', <DeleteOutlined />),
         { type: 'divider' },
         getItem('Manage labels', '6', <SettingOutlined />),
         getItem('Create new label', '7', <PlusOutlined />)
@@ -77,14 +82,12 @@ export default () => {
         >
             <Menu
                 style={{ width: '100%', height: '100%' }}
-                defaultSelectedKeys={['1']}
+                defaultSelectedKeys={['inbox']}
                 mode={'inline'}
                 theme={'light'}
                 items={items}
                 onClick={(e) => {
-                    switch (e.key) {
-                    }
-                    console.log(e.key)
+                    props.setInbox(e.key as String)
                 }}
             />
         </Sider>

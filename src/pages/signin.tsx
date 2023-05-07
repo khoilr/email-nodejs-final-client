@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { LockOutlined } from '@ant-design/icons'
-import { Button, Checkbox, Form, Input, Col, Row } from 'antd'
+import { Button, Typography, Checkbox, Form, Input, Col, Row } from 'antd'
 import { PhoneOutlined } from '@ant-design/icons'
 import CustomLayout from '@/components/Layout'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import { getCookie, setCookie } from 'cookies-next'
+import { getCookie } from 'cookies-next'
 import { NextPageContext } from 'next'
 import { auth } from '@/lib/auth'
+
+const { Title, Text } = Typography
 
 export async function getServerSideProps(ctx: NextPageContext) {
     const token = getCookie('token', ctx)
@@ -35,18 +37,21 @@ export async function getServerSideProps(ctx: NextPageContext) {
 
 export default () => {
     const router = useRouter()
+    const [dangerText, setDangerText] = useState('')
 
     const onFinish = (values: any) => {
-        console.log('Received values of form: ', values)
         axios
-            .post('http://localhost:3300/auth/sign-in', values, {
+            .post('http://localhost:3300/signin', values, {
                 withCredentials: true
             })
             .then((res) => {
-                if (res.status === 200) router.push('/')
+                if (res.status === 200) {
+                    router.push('/')
+                }
             })
             .catch((err) => {
-                console.log(err.response)
+                const response = err.response
+                setDangerText(response.data.message)
             })
     }
 
@@ -61,6 +66,10 @@ export default () => {
             >
                 {' '}
                 <Col lg={6} md={10} sm={16} xs={24}>
+                    <Title className="text-center">Email app</Title>
+                    <Title className="text-center" level={2}>
+                        Sign in
+                    </Title>
                     <Form
                         name="login"
                         onFinish={onFinish}
@@ -93,7 +102,7 @@ export default () => {
                                 }
                             ]}
                         >
-                            <Input
+                            <Input.Password
                                 size="large"
                                 prefix={
                                     <LockOutlined className="site-form-item-icon" />
@@ -102,6 +111,7 @@ export default () => {
                                 placeholder="Password"
                             />
                         </Form.Item>
+                        <Text type="danger">{dangerText}</Text>
                         <Form.Item>
                             <Form.Item
                                 name="remember"
@@ -111,11 +121,10 @@ export default () => {
                                 <Checkbox>Remember me</Checkbox>
                             </Form.Item>
 
-                            <a className="float-right" href="">
+                            <a className="float-right" href="/forgot-password">
                                 Forgot password
                             </a>
                         </Form.Item>
-
                         <Form.Item>
                             <Button
                                 type="primary"
@@ -127,7 +136,7 @@ export default () => {
                             </Button>
                         </Form.Item>
                         <Form.Item>
-                            Or <a href="/sign-up">register now!</a>
+                            Or <a href="/signup">register now!</a>
                         </Form.Item>
                     </Form>
                 </Col>

@@ -16,6 +16,7 @@ import {
 } from 'antd'
 import ComposeEmail from './ComposeEmail'
 import Profile from './Profile'
+import { account } from '@/types/account'
 
 const renderTitle = (title: string) => (
     <span>
@@ -77,7 +78,11 @@ const options = [
     }
 ]
 
-export default () => {
+type props = {
+    account: account
+}
+
+export default (props: props) => {
     // Profile drawer
     const [openProfile, setOpenProfile] = useState(false)
     const showProfileDrawer = () => {
@@ -89,12 +94,10 @@ export default () => {
 
     // Compose email modal
     const [openCompose, setOpenCompose] = useState(false)
-    const handleOk = (e: React.MouseEvent<HTMLElement>) => {
-        console.log(e)
+    const handleOk = () => {
         setOpenCompose(false)
     }
-    const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
-        console.log(e)
+    const handleCancel = () => {
         setOpenCompose(false)
     }
     const showCompose = () => {
@@ -113,6 +116,8 @@ export default () => {
                 Compose
             </Button>
             <ComposeEmail
+                sender={props.account.phone}
+                readOnly={false}
                 open={openCompose}
                 onOk={handleOk}
                 onCancel={handleCancel}
@@ -127,14 +132,18 @@ export default () => {
                 <Input.Search size="large" placeholder="Find email" />
             </AutoComplete>
             <Button
-                type="dashed"
                 className="mx-2"
+                icon={<UserOutlined />}
                 size="large"
                 onClick={showProfileDrawer}
             >
                 Profile
             </Button>
-            <Profile open={openProfile} onClose={onProfileClose} />
+            <Profile
+                open={openProfile}
+                onClose={onProfileClose}
+                account={props.account}
+            />
         </div>
     )
 }

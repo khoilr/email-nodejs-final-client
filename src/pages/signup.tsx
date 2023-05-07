@@ -1,13 +1,20 @@
 import CustomLayout from '@/components/Layout'
-import { Col, Row, Form, Input, Button, Typography } from 'antd'
-import { PhoneOutlined, LockOutlined, IdcardOutlined } from '@ant-design/icons'
+import { Col, Row, Form, Input, Button, Typography, InputRef } from 'antd'
+import {
+    MailOutlined,
+    PhoneOutlined,
+    LockOutlined,
+    IdcardOutlined
+} from '@ant-design/icons'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { getCookie } from 'cookies-next'
 import { auth } from '@/lib/auth'
 import { NextPageContext } from 'next'
+import { useState } from 'react'
+import React from 'react'
 
-const { Title } = Typography
+const { Title, Text } = Typography
 export async function getServerSideProps(ctx: NextPageContext) {
     const token = getCookie('token', ctx)
     if (token) {
@@ -33,17 +40,19 @@ export async function getServerSideProps(ctx: NextPageContext) {
 }
 export default () => {
     const router = useRouter()
+    const [dangerText, setDangerText] = useState('')
 
     const onFinish = (values: any) => {
-        console.log('Received values of form: ', values)
-        // axios
-        //     .post('http://localhost:3300/auth', values)
-        //     .then((res) => {
-        //         if (res.status === 201) router.push('/')
-        //     })
-        //     .catch((err) => {
-        //         console.log(err)
-        //     })
+        axios
+            .post('http://localhost:3300/account', values)
+            .then((res) => {
+                console.log(res.status)
+                if (res.status === 201) router.push('/')
+            })
+            .catch((err) => {
+                const response = err.response
+                setDangerText(response.data.message)
+            })
     }
 
     return (
@@ -57,12 +66,14 @@ export default () => {
             >
                 {' '}
                 <Col lg={6} md={10} sm={16} xs={24}>
-                    <Title>Khoicute</Title>
-                    <Title level={2}>Sign up</Title>
+                    <Title className="text-center">Email app</Title>
+                    <Title className="text-center" level={2}>
+                        Sign up
+                    </Title>
                     <Form
                         name="login"
                         method="POST"
-                        action="/api/sign-in"
+                        action="/api/signin"
                         onFinish={onFinish}
                         initialValues={{ remember: true }}
                     >
@@ -76,6 +87,8 @@ export default () => {
                             ]}
                         >
                             <Input
+                                maxLength={10}
+                                onChange={() => setDangerText('')}
                                 type="tel"
                                 size="large"
                                 prefix={
@@ -95,6 +108,7 @@ export default () => {
                         >
                             <Input
                                 type="text"
+                                onChange={() => setDangerText('')}
                                 size="large"
                                 prefix={
                                     <IdcardOutlined className="site-form-item-icon" />
@@ -111,8 +125,9 @@ export default () => {
                                 }
                             ]}
                         >
-                            <Input
+                            <Input.Password
                                 size="large"
+                                onChange={() => setDangerText('')}
                                 prefix={
                                     <LockOutlined className="site-form-item-icon" />
                                 }
@@ -120,6 +135,7 @@ export default () => {
                                 placeholder="Password"
                             />
                         </Form.Item>
+                        <Text type="danger">{dangerText} </Text>
                         <Form.Item>
                             <Button
                                 type="primary"
@@ -132,7 +148,7 @@ export default () => {
                         </Form.Item>
                         <Form.Item>
                             Already have an account?{' '}
-                            <a href="/sign-in">Sign in here!</a>
+                            <a href="/signin">Sign in here!</a>
                         </Form.Item>
                     </Form>
                 </Col>

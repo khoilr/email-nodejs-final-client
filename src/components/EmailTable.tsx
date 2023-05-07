@@ -1,22 +1,69 @@
-import { Drawer, Row, Space, Table, Tag, Col, Divider, FloatButton } from 'antd'
+import { Button, Space, Table, Tag, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { useState } from 'react'
-import { FormOutlined, DeleteOutlined, PlusOutlined, StarOutlined } from '@ant-design/icons'
+import { useEffect, useRef, useState } from 'react'
+import { DeleteOutlined, StarOutlined, StarFilled } from '@ant-design/icons'
+import ComposeEmail from './ComposeEmail'
+import { instance } from '@/lib/axios'
+import moment, { Moment } from 'moment'
+import ViewEmail from './ViewEmail'
+import axios from 'axios'
 
-interface DataType {
-    key: string
-    sender: string
-    subject: string
-    received: string
-    labels: string[]
+interface message {
+    key?: string
+    emailId?: string
+    sender?: string
+    subject?: string
+    received?: string
+    labels?: string[]
+    starred?: boolean
 }
 
-const columns: ColumnsType<DataType> = [
+interface messages {
+    messages?: message[]
+}
+
+const columns: ColumnsType<message> = [
     {
         title: 'Starred',
         dataIndex: 'starred',
         key: 'starred',
-        render: (starred) => <a style={{color: "black"}}><StarOutlined/></a>
+        render: (value: any, record: message, index: number) => {
+            return (
+                <Button
+                    type="ghost"
+                    onClick={() => {
+                        axios
+                            .patch(
+                                `http://localhost:3300/recipient/`,
+                                {
+                                    starred: !value,
+                                    emailId: record.emailId
+                                },
+                                {
+                                    withCredentials: true
+                                }
+                            )
+                            .then(() => {
+                                record.starred = !value
+                            })
+                    }}
+                >
+                    {value ? (
+                        <StarFilled style={{ color: '#f27fac' }} />
+                    ) : (
+                        <StarOutlined />
+                    )}
+                    {/* <StarOutlined
+                        onClick={() => {
+                            console.log(value)
+                            // axios.patch('http://localhost:3300/email/', {
+                            //     starred: !value
+                            // })
+                        }}
+                    /> */}
+                </Button>
+            )
+        }
     },
     {
         title: 'Sender',
@@ -35,7 +82,7 @@ const columns: ColumnsType<DataType> = [
         dataIndex: 'labels',
         render: (_, { labels }) => (
             <>
-                {labels.map((labels) => {
+                {labels?.map((labels) => {
                     let color = labels.length > 5 ? 'geekblue' : 'green'
                     if (labels === 'loser') {
                         color = 'volcano'
@@ -50,7 +97,7 @@ const columns: ColumnsType<DataType> = [
         )
     },
     {
-        title: 'Received time',
+        title: 'Time',
         dataIndex: 'received',
         key: 'received'
     },
@@ -59,72 +106,148 @@ const columns: ColumnsType<DataType> = [
         key: 'action',
         render: (_, record) => (
             <Space size="middle">
-                <a style={{color: "red"}}><DeleteOutlined/></a>
+                <a style={{ color: 'red' }}>
+                    <DeleteOutlined />
+                </a>
             </Space>
         )
     }
 ]
 
 const rowSelection = {
-    onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: message[]) => {
         console.log(
             `selectedRowKeys: ${selectedRowKeys}`,
             'selectedRows: ',
             selectedRows
         )
     },
-    getCheckboxProps: (record: DataType) => ({
-        disabled: record.sender === 'Disabled User', // Column configuration not to be checked
+    getCheckboxProps: (record: message) => ({
+        disabled: record.sender === 'Disabled User',
         sender: record.sender
     })
 }
 
-interface DescriptionItemProps {
-    title: string
-    content: React.ReactNode
+type props = {
+    inbox: String
 }
 
-const DescriptionItem = ({ title, content }: DescriptionItemProps) => (
-    <div className="site-description-item-profile-wrapper">
-        <p className="site-description-item-profile-p-label">{title}:</p>
-        {content}
-    </div>
-)
+export default (props: props) => {
+    const [data, setData] = useState<message[]>([])
 
-export default () => {
-    const [open, setOpen] = useState(false)
+    useEffect(() => {
+        let inbox: string
+        switch (props.inbox) {
+            case 'inbox':
+                instance.get('/email').then((res) => {
+                    data.splice(0, data.length)
 
-    const showDrawer = () => {
-        setOpen(true)
-    }
+                    res.data.map((message: any) => {
+                        console.log(message.star)
 
-    const onClose = () => {
-        setOpen(false)
-    }
+                        data.push({
+                            key: message.id,
+                            emailId: message.email.id,
+                            sender: message.email.sender.name,
+                            subject: message.email.subject,
+                            received: moment(message.receivedAt).fromNow(),
+                            labels: [],
+                            starred: message.star
+                        })
+                    })
 
-    const data: DataType[] = [
-        {
-            key: '1',
-            sender: 'John Brown',
-            subject: 'New message',
-            received: '2021-01-01',
-            labels: ['nice', 'developer']
-        },
-        {
-            key: '2',
-            sender: 'Jim Green',
-            subject: 'New message',
-            received: '2021-01-01',
-            labels: ['loser']
-        },
-        {
-            key: '3',
-            sender: 'Joe Black',
-            subject: 'New message',
-            received: '2021-01-01',
-            labels: ['cool', 'teacher']
+                    setData([...data])
+                })
+                break
+            case 'starred':
+                instance.get('/email/starred').then((res) => {
+                    console.log('khoicute', res)
+
+                    data.splice(0, data.length)
+
+                    res.data.map((message: any) => {
+                        data.push({
+                            key: message.id,
+                            emailId: message.email.id,
+                            sender: message.email.sender.name,
+                            subject: message.email.subject,
+                            received: moment(message.receivedAt).fromNow(),
+                            labels: [],
+                            starred: message.star
+                        })
+                    })
+
+                    setData([...data])
+                })
+                break
+            case 'sent':
+                instance.get('/email/sent').then((res) => {
+                    console.log(res)
+
+                    data.splice(0, data.length)
+
+                    res.data.map((message: any) => {
+                        data.push({
+                            key: message.id,
+                            emailId: message.id,
+                            sender: message.sender.phone,
+                            subject: message.subject,
+                            received: moment(message.updateAt).fromNow()
+                        })
+                    })
+
+                    setData([...data])
+                })
+                break
+            case 'drafts':
+                instance.get('/draft').then((res) => {
+                    console.log(res)
+
+                    data.splice(0, data.length)
+
+                    res.data.map((message: any) => {
+                        data.push({
+                            key: message.id,
+                            emailId: message.id,
+                            sender: message.sender.phone,
+                            subject: message.subject,
+                            received: moment(message.updateAt).fromNow()
+                        })
+                    })
+
+                    setData([...data])
+                })
+                break
+            default:
+                inbox = '/email'
         }
-    ]
+    }, [props])
+
+    // Detail email modal
+    const [viewDetail, setViewDetail] = useState(false)
+    const [emailDetailID, setEmailDetailId] = useState<string>('')
+    const handleDetailOk = () => {
+        setViewDetail(false)
+    }
+    const handleDetailCancel = () => {
+        setViewDetail(false)
+    }
+    const showDetail = () => {
+        setViewDetail(true)
+    }
+
+    // Compose email modal
+    const [viewCompose, setViewCompose] = useState(false)
+    const [emailId, setEmailId] = useState<string>('')
+    const handleOk = () => {
+        setViewCompose(false)
+    }
+    const handleCancel = () => {
+        setViewCompose(false)
+    }
+    const showCompose = () => {
+        setViewCompose(true)
+    }
 
     return (
         <>
@@ -139,128 +262,37 @@ export default () => {
                 onRow={(record, rowIndex) => {
                     return {
                         onClick: (event) => {
-                            console.log('row clicked', record, rowIndex)
-                            showDrawer()
+                            console.log(event)
+
+                            switch (props.inbox) {
+                                case 'inbox':
+                                case 'starred':
+                                    setEmailDetailId(record.emailId as string)
+                                    showDetail()
+                                    break
+                                case 'sent':
+                                case 'drafts':
+                                    setEmailId(record.emailId as string)
+                                    showCompose()
+                                    break
+                            }
                         }
                     }
                 }}
             />
-            <Drawer
-                width={640}
-                placement="right"
-                closable={false}
-                onClose={onClose}
-                open={open}
-            >
-                <p
-                    className="site-description-item-profile-p"
-                    style={{ marginBottom: 24 }}
-                >
-                    User Profile
-                </p>
-                <p className="site-description-item-profile-p">Personal</p>
-                <Row>
-                    <Col span={12}>
-                        <DescriptionItem title="Full Name" content="Lily" />
-                    </Col>
-                    <Col span={12}>
-                        <DescriptionItem
-                            title="Account"
-                            content="AntDesign@example.com"
-                        />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={12}>
-                        <DescriptionItem title="City" content="HangZhou" />
-                    </Col>
-                    <Col span={12}>
-                        <DescriptionItem title="Country" content="China🇨🇳" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={12}>
-                        <DescriptionItem
-                            title="Birthday"
-                            content="February 2,1900"
-                        />
-                    </Col>
-                    <Col span={12}>
-                        <DescriptionItem title="Website" content="-" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={24}>
-                        <DescriptionItem
-                            title="Message"
-                            content="Make things as simple as possible but no simpler."
-                        />
-                    </Col>
-                </Row>
-                <Divider />
-                <p className="site-description-item-profile-p">Company</p>
-                <Row>
-                    <Col span={12}>
-                        <DescriptionItem
-                            title="Position"
-                            content="Programmer"
-                        />
-                    </Col>
-                    <Col span={12}>
-                        <DescriptionItem
-                            title="Responsibilities"
-                            content="Coding"
-                        />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={12}>
-                        <DescriptionItem title="Department" content="XTech" />
-                    </Col>
-                    <Col span={12}>
-                        <DescriptionItem
-                            title="Supervisor"
-                            content={<a>Lin</a>}
-                        />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={24}>
-                        <DescriptionItem
-                            title="Skills"
-                            content="C / C + +, data structures, software engineering, operating systems, computer networks, databases, compiler theory, computer architecture, Microcomputer Principle and Interface Technology, Computer English, Java, ASP, etc."
-                        />
-                    </Col>
-                </Row>
-                <Divider />
-                <p className="site-description-item-profile-p">Contacts</p>
-                <Row>
-                    <Col span={12}>
-                        <DescriptionItem
-                            title="Email"
-                            content="AntDesign@example.com"
-                        />
-                    </Col>
-                    <Col span={12}>
-                        <DescriptionItem
-                            title="Phone Number"
-                            content="+86 181 0000 0000"
-                        />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={24}>
-                        <DescriptionItem
-                            title="Github"
-                            content={
-                                <a href="http://github.com/ant-design/ant-design/">
-                                    github.com/ant-design/ant-design/
-                                </a>
-                            }
-                        />
-                    </Col>
-                </Row>
-            </Drawer>
+            <ViewEmail
+                emailId={emailDetailID}
+                open={viewDetail}
+                onOk={handleDetailOk}
+                onCancel={handleDetailCancel}
+            />
+
+            <ComposeEmail
+                emailId={emailId}
+                open={viewCompose}
+                onOk={handleOk}
+                onCancel={handleCancel}
+            />
         </>
     )
 }
